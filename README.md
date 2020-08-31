@@ -17,7 +17,7 @@ Run the following command from root of your project
         }
     </code>
     
-    and then run the following command in your SSH Terminal
+    and then run the following command from your Terminal
     
     <code>composer install</code>
         
