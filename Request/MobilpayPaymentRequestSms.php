@@ -1,6 +1,6 @@
 <?php
 
-namespace Payment\Request;
+namespace Mobilpay\Payment\Request;
 
 /**
  * Class MobilpayPaymentRequestSms
@@ -11,7 +11,7 @@ namespace Payment\Request;
  * 
  */
 
-use Payment\Request\MobilpayPaymentRequestAbstract;
+use Mobilpay\Payment\Request\MobilpayPaymentRequestAbstract;
 class MobilpayPaymentRequestSms extends MobilpayPaymentRequestAbstract  
 {
 	const ERROR_LOAD_FROM_XML_SERVICE_ELEM_MISSING		= 0x31000001;

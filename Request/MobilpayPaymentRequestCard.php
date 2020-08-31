@@ -1,6 +1,6 @@
 <?php
 
-namespace Payment\Requset;
+namespace Mobilpay\Payment\Request;
 /**
  * Class MobilpayPaymentRequestCard
  * This class can be used for accessing mobilpay.ro payment interface for your configured online services
@@ -9,8 +9,8 @@ namespace Payment\Requset;
  * @version 1.0
  * 
  */
-use Payment\Requset\MobilpayPaymentRequestAbstract;
-use Payment\MobilpayPaymentInvoice;
+use Mobilpay\Payment\Requset\MobilpayPaymentRequestAbstract;
+use Mobilpay\Payment\MobilpayPaymentInvoice;
 class MobilpayPaymentRequestCard extends MobilpayPaymentRequestAbstract  
 {
 	const ERROR_LOAD_FROM_XML_ORDER_INVOICE_ELEM_MISSING	= 0x30000001;

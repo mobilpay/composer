@@ -1,5 +1,5 @@
 {
-    "name": "mobilpay/php_card_lib",
+    "name": "mobilpay/payment",
     "description": "Set of library that give you the means to incorporate mobilPay functionality into your website applications and mobile apps.",
     "type": "library",
     "license": "AGPL-3.0-or-later",

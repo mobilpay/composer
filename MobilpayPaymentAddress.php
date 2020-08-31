@@ -1,6 +1,6 @@
 <?php
 
-namespace Payment;
+namespace Mobilpay\Payment;
 
 
 /**

@@ -1,6 +1,6 @@
 <?php
 
-namespace Payment\Request;
+namespace Mobilpay\Payment\Request;
 /**
  * mobilPay
  *
@@ -11,7 +11,7 @@ namespace Payment\Request;
  * This class is used for the IPN
  */
 
-use Payment\MobilpayPaymentAddress;
+use Mobilpay\Payment\MobilpayPaymentAddress;
 class MobilpayPaymentRequestNotify {
 
     /**

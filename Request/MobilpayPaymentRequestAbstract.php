@@ -1,6 +1,6 @@
 <?php
 
-namespace Payment\Request;
+namespace Mobilpay\Payment\Request;
 /**
  * Class MobilpayPaymentRequestAbstract
  * This class can be used for accessing mobilpay.ro payment interface for your configured online services
@@ -13,7 +13,7 @@ namespace Payment\Request;
  * Check PHP documentation for installing OpenSSL package
  */
 
-use Payment\Request\MobilpayPaymentRequestSms;
+use Mobilpay\Payment\Request\MobilpayPaymentRequestSms;
 abstract class MobilpayPaymentRequestAbstract
 {
 	const PAYMENT_TYPE_SMS	= 'sms';

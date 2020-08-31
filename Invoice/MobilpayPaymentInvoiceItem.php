@@ -1,6 +1,6 @@
 <?php
 
-namespace Payment\Invoice;
+namespace Mobilpay\Payment\Invoice;
 /**
  * Class MobilpayPaymentInvoiceItem
  * @copyright NETOPIA
