@@ -1,12 +1,12 @@
 {
-    "name": "mobilpay/payment",
-    "description": "Set of library that give you the means to incorporate mobilPay functionality into your website applications and mobile apps.",
+    "name": "netopia/payment",
+    "description": "Set of library that give you the means to incorporate NETOPIA Payments functionality into your website applications and mobile apps.",
     "type": "library",
     "license": "AGPL-3.0-or-later",
     "authors": [
         {
             "name": "NETOPIA Payments",
-            "email": "implementare@mobilpay.ro"
+            "email": "implementare@netopia-system.com"
         }
     ],
     "minimum-stability": "dev",
@@ -19,6 +19,5 @@
         "psr-4": {
             "mobilpay\\composer\\": "*"
         }
-    },
-    "version": "0.0.1"
+    }
 }

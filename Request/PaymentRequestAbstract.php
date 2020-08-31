@@ -1,8 +1,8 @@
 <?php
 
-namespace Mobilpay\Payment\Request;
+namespace Netopia\Payment\Request;
 /**
- * Class MobilpayPaymentRequestAbstract
+ * Class PaymentRequestAbstract
  * This class can be used for accessing mobilpay.ro payment interface for your configured online services
  * @copyright NETOPIA
  * @author Claudiu Tudose
@@ -13,8 +13,8 @@ namespace Mobilpay\Payment\Request;
  * Check PHP documentation for installing OpenSSL package
  */
 
-use Mobilpay\Payment\Request\MobilpayPaymentRequestSms;
-abstract class MobilpayPaymentRequestAbstract
+use Netopia\Payment\Request\PaymentRequestSms;
+abstract class PaymentRequestAbstract
 {
 	const PAYMENT_TYPE_SMS	= 'sms';
 	const PAYMENT_TYPE_CARD	= 'card';
@@ -54,8 +54,8 @@ abstract class MobilpayPaymentRequestAbstract
 	public $signature 	= null;
 	/**
 	 * service - identifier of service/product for which you're requesting a payment
-	 * Mandatory for MobilpayPaymentRequestSms
-	 * Optional for MobilpayPaymentRequestCard 
+	 * Mandatory for PaymentRequestSms
+	 * Optional for PaymentRequestCard 
 	 */
 	public $service		= null;
 	
@@ -132,13 +132,13 @@ abstract class MobilpayPaymentRequestAbstract
 		if(@$xmlDoc->loadXML($data) === true)
 		{
 			//try to create payment request from xml
-			$objPmReq = MobilpayPaymentRequestAbstract::_factoryFromXml($xmlDoc);
+			$objPmReq = PaymentRequestAbstract::_factoryFromXml($xmlDoc);
 			$objPmReq->_setRequestInfo(self::VERSION_XML, $data);
 		}
 		else
 		{
 			//try to create payment request from query string
-			$objPmReq = MobilpayPaymentRequestAbstract::_factoryFromQueryString($data);
+			$objPmReq = PaymentRequestAbstract::_factoryFromQueryString($data);
 			$objPmReq->_setRequestInfo(self::VERSION_QUERY_STRING, $data);
 		}
 		
@@ -181,7 +181,7 @@ abstract class MobilpayPaymentRequestAbstract
 			throw new Exception('Failed decrypting data', self::ERROR_CONFIRM_FAILED_DECRYPT_DATA);
 		}
 		
-		return MobilpayPaymentRequestAbstract::factory($data);
+		return PaymentRequestAbstract::factory($data);
 	}
 	
 	static protected function _factoryFromXml(DOMDocument $xmlDoc)
@@ -189,25 +189,25 @@ abstract class MobilpayPaymentRequestAbstract
 		$elems = $xmlDoc->getElementsByTagName('order');
 		if($elems->length != 1)
 		{
-			throw new Exception('factoryFromXml order element not found', MobilpayPaymentRequestAbstract::ERROR_FACTORY_BY_XML_ORDER_ELEM_NOT_FOUND);
+			throw new Exception('factoryFromXml order element not found', PaymentRequestAbstract::ERROR_FACTORY_BY_XML_ORDER_ELEM_NOT_FOUND);
 		}
 		$orderElem = $elems->item(0);
 		
 		$attr = $orderElem->attributes->getNamedItem('type');
 		if($attr == null || strlen($attr->nodeValue) == 0)
 		{
-			throw new Exception('factoryFromXml invalid payment request type=' . $attr->nodeValue, MobilpayPaymentRequestAbstract::ERROR_FACTORY_BY_XML_ORDER_TYPE_ATTR_NOT_FOUND);
+			throw new Exception('factoryFromXml invalid payment request type=' . $attr->nodeValue, PaymentRequestAbstract::ERROR_FACTORY_BY_XML_ORDER_TYPE_ATTR_NOT_FOUND);
 		}
 		switch ($attr->nodeValue)
 		{
-		case MobilpayPaymentRequestAbstract::PAYMENT_TYPE_CARD:
-			$objPmReq = new MobilpayPaymentRequestCard();
+		case PaymentRequestAbstract::PAYMENT_TYPE_CARD:
+			$objPmReq = new PaymentRequestCard();
 			break;
-		case MobilpayPaymentRequestAbstract::PAYMENT_TYPE_SMS:
-			$objPmReq =  new MobilpayPaymentRequestSms();
+		case PaymentRequestAbstract::PAYMENT_TYPE_SMS:
+			$objPmReq =  new PaymentRequestSms();
 			break;
 		default:
-			throw new Exception('factoryFromXml invalid payment request type=' . $attr->nodeValue, MobilpayPaymentRequestAbstract::ERROR_FACTORY_BY_XML_INVALID_TYPE);
+			throw new Exception('factoryFromXml invalid payment request type=' . $attr->nodeValue, PaymentRequestAbstract::ERROR_FACTORY_BY_XML_INVALID_TYPE);
 			break;
 		}
 		$objPmReq->_loadFromXml($orderElem);
@@ -217,7 +217,7 @@ abstract class MobilpayPaymentRequestAbstract
 	
 	static protected function _factoryFromQueryString($data)
 	{
-		$objPmReq = new MobilpayPaymentRequestSms();
+		$objPmReq = new PaymentRequestSms();
 		$objPmReq->_loadFromQueryString($data); 
 		return $objPmReq;
 	}
@@ -239,14 +239,14 @@ abstract class MobilpayPaymentRequestAbstract
 		$xmlAttr = $elem->attributes->getNamedItem('id');
 		if($xmlAttr == null || strlen((string)$xmlAttr->nodeValue) == 0)
 		{
-			throw new Exception('MobilpayPaymentRequestSms::_parseFromXml failed: empty order id', self::ERROR_LOAD_FROM_XML_ORDER_ID_ATTR_MISSING);
+			throw new Exception('PaymentRequestSms::_parseFromXml failed: empty order id', self::ERROR_LOAD_FROM_XML_ORDER_ID_ATTR_MISSING);
 		}
 		$this->orderId = $xmlAttr->nodeValue;
 		
 		$elems = $elem->getElementsByTagName('signature');
 		if($elems->length != 1)
 		{
-			throw new Exception('MobilpayPaymentRequestSms::loadFromXml failed: signature is missing', self::ERROR_LOAD_FROM_XML_SIGNATURE_ELEM_MISSING);
+			throw new Exception('PaymentRequestSms::loadFromXml failed: signature is missing', self::ERROR_LOAD_FROM_XML_SIGNATURE_ELEM_MISSING);
 		}
 		$xmlElem = $elems->item(0);
 		$this->signature = $xmlElem->nodeValue;
@@ -297,7 +297,7 @@ abstract class MobilpayPaymentRequestAbstract
 		$elems = $elem->getElementsByTagName('mobilpay');
 		if($elems->length == 1)
 		{
-			$this->objPmNotify = new MobilpayPaymentRequestNotify();
+			$this->objPmNotify = new PaymentRequestNotify();
 			$this->objPmNotify->loadFromXml($elems->item(0));
 		}
 	}

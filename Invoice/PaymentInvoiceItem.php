@@ -1,14 +1,14 @@
 <?php
 
-namespace Mobilpay\Payment\Invoice;
+namespace Netopia\Payment\Invoice;
 /**
- * Class MobilpayPaymentInvoiceItem
+ * Class PaymentInvoiceItem
  * @copyright NETOPIA
  * @author Claudiu Tudose
  * @version 1.0
  * 
  */
-class MobilpayPaymentInvoiceItem
+class PaymentInvoiceItem
 {
 	const ERROR_INVALID_PARAMETER			= 0x11111001;
 	const ERROR_INVALID_PROPERTY			= 0x11110002;
@@ -41,14 +41,14 @@ class MobilpayPaymentInvoiceItem
 		$elems = $elem->getElementsByTagName('code');
 		if($elems->length != 1)
 		{
-			throw new Exception('MobilpayPaymentInvoiceItem::loadFromXml failed! Invalid code element.', self::ERROR_LOAD_FROM_XML_CODE_ELEM_MISSING);
+			throw new Exception('PaymentInvoiceItem::loadFromXml failed! Invalid code element.', self::ERROR_LOAD_FROM_XML_CODE_ELEM_MISSING);
 		}
 		$this->code = urldecode($elems->item(0)->nodeValue);
 
 		$elems = $elem->getElementsByTagName('name');
 		if($elems->length != 1)
 		{
-			throw new Exception('MobilpayPaymentInvoiceItem::loadFromXml failed! Invalid name element.', self::ERROR_LOAD_FROM_XML_NAME_ELEM_MISSING);
+			throw new Exception('PaymentInvoiceItem::loadFromXml failed! Invalid name element.', self::ERROR_LOAD_FROM_XML_NAME_ELEM_MISSING);
 		}
 		$this->name = urldecode($elems->item(0)->nodeValue);
 
@@ -61,29 +61,29 @@ class MobilpayPaymentInvoiceItem
 		$elems = $elem->getElementsByTagName('quantity');
 		if($elems->length != 1)
 		{
-			throw new Exception('MobilpayPaymentInvoiceItem::loadFromXml failed! Invalid quantity element.', self::ERROR_LOAD_FROM_XML_QUANTITY_ELEM_MISSING);
+			throw new Exception('PaymentInvoiceItem::loadFromXml failed! Invalid quantity element.', self::ERROR_LOAD_FROM_XML_QUANTITY_ELEM_MISSING);
 		}
 		$this->quantity = doubleval(urldecode($elems->item(0)->nodeValue));
 		if($this->quantity == 0)
 		{
-			throw new Exception('MobilpayPaymentInvoiceItem::loadFromXml failed! Invalid quantity value=' . $this->quantity, self::ERROR_LOAD_FROM_XML_QUANTITY_ELEM_EMPTY);
+			throw new Exception('PaymentInvoiceItem::loadFromXml failed! Invalid quantity value=' . $this->quantity, self::ERROR_LOAD_FROM_XML_QUANTITY_ELEM_EMPTY);
 		}
 
 		$elems = $elem->getElementsByTagName('price');
 		if($elems->length != 1)
 		{
-			throw new Exception('MobilpayPaymentInvoiceItem::loadFromXml failed! Invalid price element.', self::ERROR_LOAD_FROM_XML_PRICE_ELEM_MISSING);
+			throw new Exception('PaymentInvoiceItem::loadFromXml failed! Invalid price element.', self::ERROR_LOAD_FROM_XML_PRICE_ELEM_MISSING);
 		}
 		$this->price = doubleval(urldecode($elems->item(0)->nodeValue));
 		if($this->price == 0)
 		{
-			throw new Exception('MobilpayPaymentInvoiceItem::loadFromXml failed! Invalid price value=' . $this->price, self::ERROR_LOAD_FROM_XML_PRICE_ELEM_EMPTY);
+			throw new Exception('PaymentInvoiceItem::loadFromXml failed! Invalid price value=' . $this->price, self::ERROR_LOAD_FROM_XML_PRICE_ELEM_EMPTY);
 		}
 
 		$elems = $elem->getElementsByTagName('vat');
 		if($elems->length != 1)
 		{
-			throw new Exception('MobilpayPaymentInvoiceItem::loadFromXml failed! Invalid vat element.', self::ERROR_LOAD_FROM_XML_VAT_ELEM_MISSING);
+			throw new Exception('PaymentInvoiceItem::loadFromXml failed! Invalid vat element.', self::ERROR_LOAD_FROM_XML_VAT_ELEM_MISSING);
 		}
 		$this->vat = doubleval(urldecode($elems->item(0)->nodeValue));
 		

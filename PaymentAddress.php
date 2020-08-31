@@ -1,16 +1,16 @@
 <?php
 
-namespace Mobilpay\Payment;
+namespace Netopia\Payment;
 
 
 /**
- * Class MobilpayPaymentAddress
+ * Class PaymentAddress
  * @copyright NETOPIA
  * @author Claudiu Tudose
  * @version 1.0
  * 
  */
-class MobilpayPaymentAddress
+class PaymentAddress
 {
     const TYPE_COMPANY = 'company';
     const TYPE_PERSON = 'person';
@@ -26,7 +26,7 @@ class MobilpayPaymentAddress
     public $email = null;
     public $mobilePhone = null;
 
-    public function __construct (DOMNode $elem = null)
+    public function __construct (\DOMNode $elem = null)
     {
 
         if ($elem != null)
@@ -35,7 +35,7 @@ class MobilpayPaymentAddress
         }
     }
 
-    protected function loadFromXml (DOMNode $elem)
+    protected function loadFromXml (\DOMNode $elem)
     {
 
         $attr = $elem->attributes->getNamedItem('type');
@@ -73,22 +73,22 @@ class MobilpayPaymentAddress
         }
     }
 
-    public function createXmlElement (DOMDocument $xmlDoc, $nodeName)
+    public function createXmlElement (\DOMDocument $xmlDoc, $nodeName)
     {
 
-        if (! ($xmlDoc instanceof DOMDocument))
+        if (! ($xmlDoc instanceof \DOMDocument))
         {
-            throw new Exception('', self::ERROR_INVALID_PARAMETER);
+            throw new \Exception('', self::ERROR_INVALID_PARAMETER);
         }
         
         $addrElem = $xmlDoc->createElement($nodeName);
         
         if ($this->type == null)
         {
-            throw new Exception('Invalid address type', self::ERROR_INVALID_ADDRESS_TYPE);
+            throw new \Exception('Invalid address type', self::ERROR_INVALID_ADDRESS_TYPE);
         } elseif ($this->type != self::TYPE_COMPANY && $this->type != self::TYPE_PERSON)
         {
-            throw new Exception('Invalid address type', self::ERROR_INVALID_ADDRESS_TYPE_VALUE);
+            throw new \Exception('Invalid address type', self::ERROR_INVALID_ADDRESS_TYPE_VALUE);
         }
         
         $xmlAttr = $xmlDoc->createAttribute('type');

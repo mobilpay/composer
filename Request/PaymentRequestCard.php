@@ -1,17 +1,17 @@
 <?php
 
-namespace Mobilpay\Payment\Request;
+namespace Netopia\Payment\Request;
 /**
- * Class MobilpayPaymentRequestCard
+ * Class PaymentRequestCard
  * This class can be used for accessing mobilpay.ro payment interface for your configured online services
  * @copyright NETOPIA
  * @author Claudiu Tudose
  * @version 1.0
  * 
  */
-use Mobilpay\Payment\Requset\MobilpayPaymentRequestAbstract;
-use Mobilpay\Payment\MobilpayPaymentInvoice;
-class MobilpayPaymentRequestCard extends MobilpayPaymentRequestAbstract  
+use Netopia\Payment\Request\PaymentRequestAbstract;
+use Netopia\Payment\PaymentInvoice;
+class PaymentRequestCard extends PaymentRequestAbstract  
 {
 	const ERROR_LOAD_FROM_XML_ORDER_INVOICE_ELEM_MISSING	= 0x30000001;
 	
@@ -23,7 +23,7 @@ class MobilpayPaymentRequestCard extends MobilpayPaymentRequestAbstract
 		$this->type = self::PAYMENT_TYPE_CARD;
 	}
 	
-	protected function _loadFromXml(DOMElement $elem)
+	protected function _loadFromXml(\DOMElement $elem)
 	{
 		parent::_parseFromXml($elem);
 		
@@ -31,22 +31,22 @@ class MobilpayPaymentRequestCard extends MobilpayPaymentRequestAbstract
 		$elems = $elem->getElementsByTagName('invoice');
 		if($elems->length != 1)
 		{
-			throw new Exception('MobilpayPaymentRequestCard::loadFromXml failed; invoice element is missing', self::ERROR_LOAD_FROM_XML_ORDER_INVOICE_ELEM_MISSING);
+			throw new Exception('PaymentRequestCard::loadFromXml failed; invoice element is missing', self::ERROR_LOAD_FROM_XML_ORDER_INVOICE_ELEM_MISSING);
 		}
 		
-		$this->invoice = new MobilpayPaymentInvoice($elems->item(0));
+		$this->invoice = new PaymentInvoice($elems->item(0));
 
 		return $this;
 	}
 	
 	protected function _prepare()
 	{
-		if(is_null($this->signature) || is_null($this->orderId) || !($this->invoice instanceof MobilpayPaymentInvoice))
+		if(is_null($this->signature) || is_null($this->orderId) || !($this->invoice instanceof PaymentInvoice))
 		{
-			throw new Exception('One or more mandatory properties are invalid!', self::ERROR_PREPARE_MANDATORY_PROPERTIES_UNSET);
+			throw new \Exception('One or more mandatory properties are invalid!', self::ERROR_PREPARE_MANDATORY_PROPERTIES_UNSET);
 		}
 		
-		$this->_xmlDoc 		= new DOMDocument('1.0', 'utf-8');
+		$this->_xmlDoc 		= new \DOMDocument('1.0', 'utf-8');
 		$rootElem 			= $this->_xmlDoc->createElement('order');
 
 		//set payment type attribute

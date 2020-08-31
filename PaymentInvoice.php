@@ -1,15 +1,16 @@
 <?php
 
-namespace Mobilpay\Payment;
+namespace Netopia\Payment;
 
 /**
- * Class MobilpayPaymentInvoice
+ * Class PaymentInvoice
  * @copyright NETOPIA
  * @author Claudiu Tudose
  * @version 1.0
  *
  */
-class MobilpayPaymentInvoice
+use Netopia\Payment\Invoice\PaymentInvoiceItem;
+class PaymentInvoice
 {
 	const ERROR_INVALID_PARAMETER			= 0x11110001;
 	const ERROR_INVALID_CURRENCY			= 0x11110002;
@@ -32,7 +33,7 @@ class MobilpayPaymentInvoice
 	protected $items			= array();
 	protected $exchangeRates	= array();
 
-	public function __construct(DOMNode $elem = null)
+	public function __construct(\DOMNode $elem = null)
 	{
 		if($elem != null)
 		{
@@ -40,12 +41,12 @@ class MobilpayPaymentInvoice
 		}
 	}
 
-	protected function loadFromXml(DOMNode $elem)
+	protected function loadFromXml(\DOMNode $elem)
 	{
 		$attr = $elem->attributes->getNamedItem('currency');
 		if($attr == null)
 		{
-			throw new Exception('MobilpayPaymentInvoice::loadFromXml failed; currency attribute missing', self::ERROR_LOAD_FROM_XML_CURRENCY_ATTR_MISSING);
+			throw new \Exception('PaymentInvoice::loadFromXml failed; currency attribute missing', self::ERROR_LOAD_FROM_XML_CURRENCY_ATTR_MISSING);
 		}
 		$this->currency = $attr->nodeValue;
 
@@ -93,13 +94,13 @@ class MobilpayPaymentInvoice
 			$elems = $addrElem->getElementsByTagName('billing');
 			if($elems->length == 1)
 			{
-				$this->billingAddress = new MobilpayPaymentAddress($elems->item(0));
+				$this->billingAddress = new PaymentAddress($elems->item(0));
 			}
 
 			$elems = $addrElem->getElementsByTagName('shipping');
 			if($elems->length == 1)
 			{
-				$this->shippingAddress = new MobilpayPaymentAddress($elems->item(0));
+				$this->shippingAddress = new PaymentAddress($elems->item(0));
 			}
 		}
 
@@ -116,11 +117,11 @@ class MobilpayPaymentInvoice
 				{
 					try
 					{
-						$objItem = new MobilpayPaymentInvoiceItem($itemElem);
+						$objItem = new PaymentInvoiceItem($itemElem);
 						$this->items[] = $objItem;
 						$amount += $objItem->getTotalAmount();
 					}
-					catch (Exception $e)
+					catch (\Exception $e)
 					{
 						$e = $e;
 						continue;
@@ -130,40 +131,40 @@ class MobilpayPaymentInvoice
 			}
 		}
 
-		$this->exchangeRates = array();
-		$elems = $elem->getElementsByTagName('exchange_rates');
-		if($elems->length == 1)
-		{
-			$rateElems = $elems->item(0);
-			$elems = $rateElems->getElementsByTagName('rate');
-			foreach ($elems as $rateElem)
-			{
-				try
-				{
-					$objRate = new Mobilpay_Payment_Exchange_Rate($rateElem);
-					$this->exchangeRates[] = $objRate;
-				}
-				catch (Exception $e)
-				{
-					$e = $e;
-					continue;
-				}
-			}
-		}
+//		$this->exchangeRates = array();
+//		$elems = $elem->getElementsByTagName('exchange_rates');
+//		if($elems->length == 1)
+//		{
+//			$rateElems = $elems->item(0);
+//			$elems = $rateElems->getElementsByTagName('rate');
+//			foreach ($elems as $rateElem)
+//			{
+//				try
+//				{
+//					$objRate = new Mobilpay_Payment_Exchange_Rate($rateElem);
+//					$this->exchangeRates[] = $objRate;
+//				}
+//				catch (Exception $e)
+//				{
+//					$e = $e;
+//					continue;
+//				}
+//			}
+//		}
 	}
 
-	public function createXmlElement(DOMDocument $xmlDoc)
+	public function createXmlElement(\DOMDocument $xmlDoc)
 	{
-		if(!($xmlDoc instanceof DOMDocument))
+		if(!($xmlDoc instanceof \DOMDocument))
 		{
-			throw new Exception('', self::ERROR_INVALID_PARAMETER);
+			throw new \Exception('', self::ERROR_INVALID_PARAMETER);
 		}
 
 		$xmlInvElem = $xmlDoc->createElement('invoice');
 
 		if($this->currency == null)
 		{
-			throw new Exception('Invalid currency', self::ERROR_INVALID_CURRENCY);
+			throw new \Exception('Invalid currency', self::ERROR_INVALID_CURRENCY);
 		}
 
 		$xmlAttr 			= $xmlDoc->createAttribute('currency');
@@ -212,10 +213,10 @@ class MobilpayPaymentInvoice
 			$xmlInvElem->appendChild($xmlElem);
 		}
 
-		if(($this->billingAddress instanceof MobilpayPaymentAddress) || ($this->shippingAddress instanceof MobilpayPaymentAddress))
+		if(($this->billingAddress instanceof PaymentAddress) || ($this->shippingAddress instanceof PaymentAddress))
 		{
 			$xmlAddr = null;
-			if($this->billingAddress instanceof MobilpayPaymentAddress)
+			if($this->billingAddress instanceof PaymentAddress)
 			{
 				try
 				{
@@ -226,12 +227,12 @@ class MobilpayPaymentInvoice
 					}
 					$xmlAddr->appendChild($xmlElem);
 				}
-				catch(Exception $e)
+				catch(\Exception $e)
 				{
 					$e = $e;
 				}
 			}
-			if($this->shippingAddress instanceof MobilpayPaymentAddress)
+			if($this->shippingAddress instanceof PaymentAddress)
 			{
 				try
 				{
@@ -242,7 +243,7 @@ class MobilpayPaymentInvoice
 					}
 					$xmlAddr->appendChild($xmlElem);
 				}
-				catch(Exception $e)
+				catch(\Exception $e)
 				{
 					$e = $e;
 				}
@@ -258,7 +259,7 @@ class MobilpayPaymentInvoice
 			$xmlItems = null;
 			foreach ($this->items as $item)
 			{
-				if(!($item instanceof MobilpayPaymentInvoiceItem))
+				if(!($item instanceof PaymentInvoiceItem))
 				{
 					continue;
 				}
@@ -271,7 +272,7 @@ class MobilpayPaymentInvoice
 					}
 					$xmlItems->appendChild($xmlItem);
 				}
-				catch (Exception $e)
+				catch (\Exception $e)
 				{
 					$e = $e;
 				}
@@ -282,46 +283,46 @@ class MobilpayPaymentInvoice
 			}
 		}
 
-		if(is_array($this->exchangeRates) && sizeof($this->exchangeRates) > 0)
-		{
-			$xmlRates = null;
-			foreach ($this->exchangeRates as $rate)
-			{
-				if(!($rate instanceof Mobilpay_Payment_Exchange_Rate))
-				{
-					continue;
-				}
-				try
-				{
-					$xmlRate = $rate->createXmlElement($xmlDoc);
-					if($xmlRates == null)
-					{
-						$xmlRates = $xmlDoc->createElement('items');
-					}
-					$xmlRates->appendChild($xmlRate);
-				}
-				catch (Exception $e)
-				{
-					$e = $e;
-				}
-			}
-			if($xmlItems != null)
-			{
-				$xmlInvElem->appendChild($xmlRates);
-			}
-		}
+//		if(is_array($this->exchangeRates) && sizeof($this->exchangeRates) > 0)
+//		{
+//			$xmlRates = null;
+//			foreach ($this->exchangeRates as $rate)
+//			{
+//				if(!($rate instanceof Mobilpay_Payment_Exchange_Rate))
+//				{
+//					continue;
+//				}
+//				try
+//				{
+//					$xmlRate = $rate->createXmlElement($xmlDoc);
+//					if($xmlRates == null)
+//					{
+//						$xmlRates = $xmlDoc->createElement('items');
+//					}
+//					$xmlRates->appendChild($xmlRate);
+//				}
+//				catch (\Exception $e)
+//				{
+//					$e = $e;
+//				}
+//			}
+//			if($xmlItems != null)
+//			{
+//				$xmlInvElem->appendChild($xmlRates);
+//			}
+//		}
 
 		return $xmlInvElem;
 	}
 
-	public function setBillingAddress(MobilpayPaymentAddress $address)
+	public function setBillingAddress(PaymentAddress $address)
 	{
 		$this->billingAddress = $address;
 
 		return $this;
 	}
 
-	public function setShippingAddress(MobilpayPaymentAddress $address)
+	public function setShippingAddress(PaymentAddress $address)
 	{
 		$this->shippingAddress = $address;
 
@@ -338,14 +339,14 @@ class MobilpayPaymentInvoice
 		return $this->shippingAddress;
 	}
 
-	public function addHeadItem(MobilpayPaymentInvoiceItem $item)
+	public function addHeadItem(PaymentInvoiceItem $item)
 	{
 		array_unshift($this->items, $item);
 
 		return $this;
 	}
 
-	public function addTailItem(MobilpayPaymentInvoiceItem $item)
+	public function addTailItem(PaymentInvoiceItem $item)
 	{
 		array_push($this->items, $item);
 
@@ -362,19 +363,19 @@ class MobilpayPaymentInvoice
 		return array_pop($this->items);
 	}
 
-	public function addHeadExchangeRate(Mobilpay_Payment_Exchange_Rate $rate)
-	{
-		array_unshift($this->exchangeRates, $rate);
+//	public function addHeadExchangeRate(Mobilpay_Payment_Exchange_Rate $rate)
+//	{
+//		array_unshift($this->exchangeRates, $rate);
+//
+//		return $this;
+//	}
 
-		return $this;
-	}
-
-	public function addTailExchangeRate(Mobilpay_Payment_Exchange_Rate $rate)
-	{
-		array_push($this->exchangeRates, $rate);
-
-		return $this;
-	}
+//	public function addTailExchangeRate(Mobilpay_Payment_Exchange_Rate $rate)
+//	{
+//		array_push($this->exchangeRates, $rate);
+//
+//		return $this;
+//	}
 
 	public function removeHeadExchangeRate()
 	{
