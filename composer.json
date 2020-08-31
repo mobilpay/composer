@@ -1,0 +1,24 @@
+{
+    "name": "mobilpay/php_card_lib",
+    "description": "Set of library that give you the means to incorporate mobilPay functionality into your website applications and mobile apps.",
+    "type": "library",
+    "license": "AGPL-3.0-or-later",
+    "authors": [
+        {
+            "name": "NETOPIA Payments",
+            "email": "implementare@mobilpay.ro"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {
+        "php": ">=5.5",
+        "ext-dom": "*",
+        "ext-simplexml": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "mobilpay\\composer\\": "*"
+        }
+    },
+    "version": "0.0.1"
+}
