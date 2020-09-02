@@ -17,7 +17,7 @@
     },
     "autoload": {
         "psr-4": {
-            "mobilpay\\composer\\": "src/"
+            "Netopia\\Payment\\": "src/"
         }
     }
 }
