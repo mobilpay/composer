@@ -13,7 +13,7 @@
     "require": {
         "php": ">=5.5",
         "ext-dom": "*",
-        "ext-simplexml": "*"
+        "ext-simplexml": "src/"
     },
     "autoload": {
         "psr-4": {
