@@ -13,12 +13,11 @@
     "require": {
         "php": ">=5.5",
         "ext-dom": "*",
-        "ext-simplexml": "src/"
+        "ext-simplexml": "*"
     },
     "autoload": {
         "psr-4": {
-            "mobilpay\\composer\\": "*"
+            "mobilpay\\composer\\": "src/"
         }
-    },
-    "version": "1.0.1"
+    }
 }
