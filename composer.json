@@ -19,5 +19,6 @@
         "psr-4": {
             "mobilpay\\composer\\": "*"
         }
-    }
+    },
+    "version": "1.0.1"
 }
