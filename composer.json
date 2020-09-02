@@ -1,5 +1,5 @@
 {
-    "name": "netopia/payment",
+    "name": "netopia/Payment",
     "description": "Set of library that give you the means to incorporate NETOPIA Payments functionality into your website applications and mobile apps.",
     "type": "library",
     "license": "AGPL-3.0-or-later",
