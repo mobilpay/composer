@@ -3,14 +3,14 @@
 namespace Netopia\Payment;
 
 /**
- * Class PaymentInvoice
+ * Class Invoice
  * @copyright NETOPIA
  * @author Claudiu Tudose
  * @version 1.0
  *
  */
-use Netopia\Payment\Invoice\PaymentInvoiceItem;
-class PaymentInvoice
+use Netopia\Payment\Invoice\Item;
+class Invoice
 {
 	const ERROR_INVALID_PARAMETER			= 0x11110001;
 	const ERROR_INVALID_CURRENCY			= 0x11110002;
@@ -46,7 +46,7 @@ class PaymentInvoice
 		$attr = $elem->attributes->getNamedItem('currency');
 		if($attr == null)
 		{
-			throw new \Exception('PaymentInvoice::loadFromXml failed; currency attribute missing', self::ERROR_LOAD_FROM_XML_CURRENCY_ATTR_MISSING);
+			throw new \Exception('Invoice::loadFromXml failed; currency attribute missing', self::ERROR_LOAD_FROM_XML_CURRENCY_ATTR_MISSING);
 		}
 		$this->currency = $attr->nodeValue;
 
@@ -94,13 +94,13 @@ class PaymentInvoice
 			$elems = $addrElem->getElementsByTagName('billing');
 			if($elems->length == 1)
 			{
-				$this->billingAddress = new PaymentAddress($elems->item(0));
+				$this->billingAddress = new Address($elems->item(0));
 			}
 
 			$elems = $addrElem->getElementsByTagName('shipping');
 			if($elems->length == 1)
 			{
-				$this->shippingAddress = new PaymentAddress($elems->item(0));
+				$this->shippingAddress = new Address($elems->item(0));
 			}
 		}
 
@@ -117,7 +117,7 @@ class PaymentInvoice
 				{
 					try
 					{
-						$objItem = new PaymentInvoiceItem($itemElem);
+						$objItem = new Item($itemElem);
 						$this->items[] = $objItem;
 						$amount += $objItem->getTotalAmount();
 					}
@@ -213,10 +213,10 @@ class PaymentInvoice
 			$xmlInvElem->appendChild($xmlElem);
 		}
 
-		if(($this->billingAddress instanceof PaymentAddress) || ($this->shippingAddress instanceof PaymentAddress))
+		if(($this->billingAddress instanceof Address) || ($this->shippingAddress instanceof Address))
 		{
 			$xmlAddr = null;
-			if($this->billingAddress instanceof PaymentAddress)
+			if($this->billingAddress instanceof Address)
 			{
 				try
 				{
@@ -232,7 +232,7 @@ class PaymentInvoice
 					$e = $e;
 				}
 			}
-			if($this->shippingAddress instanceof PaymentAddress)
+			if($this->shippingAddress instanceof Address)
 			{
 				try
 				{
@@ -259,7 +259,7 @@ class PaymentInvoice
 			$xmlItems = null;
 			foreach ($this->items as $item)
 			{
-				if(!($item instanceof PaymentInvoiceItem))
+				if(!($item instanceof Item))
 				{
 					continue;
 				}
@@ -315,14 +315,14 @@ class PaymentInvoice
 		return $xmlInvElem;
 	}
 
-	public function setBillingAddress(PaymentAddress $address)
+	public function setBillingAddress(Address $address)
 	{
 		$this->billingAddress = $address;
 
 		return $this;
 	}
 
-	public function setShippingAddress(PaymentAddress $address)
+	public function setShippingAddress(Address $address)
 	{
 		$this->shippingAddress = $address;
 
@@ -339,14 +339,14 @@ class PaymentInvoice
 		return $this->shippingAddress;
 	}
 
-	public function addHeadItem(PaymentInvoiceItem $item)
+	public function addHeadItem(Item $item)
 	{
 		array_unshift($this->items, $item);
 
 		return $this;
 	}
 
-	public function addTailItem(PaymentInvoiceItem $item)
+	public function addTailItem(Item $item)
 	{
 		array_push($this->items, $item);
 

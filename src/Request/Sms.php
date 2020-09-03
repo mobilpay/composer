@@ -3,7 +3,7 @@
 namespace Netopia\Payment\Request;
 
 /**
- * Class PaymentRequestSms
+ * Class Sms
  * This class can be used for accessing mobilpay.ro payment interface for your configured online services
  * @copyright NETOPIA
  * @author Claudiu Tudose
@@ -11,8 +11,8 @@ namespace Netopia\Payment\Request;
  * 
  */
 
-use Netopia\Payment\Request\PaymentRequestAbstract;
-class PaymentRequestSms extends PaymentRequestAbstract  
+use Netopia\Payment\Request\PaymentAbstract;
+class Sms extends PaymentAbstract  
 {
 	const ERROR_LOAD_FROM_XML_SERVICE_ELEM_MISSING		= 0x31000001;
 	/**
@@ -37,7 +37,7 @@ class PaymentRequestSms extends PaymentRequestAbstract
 		$elems = $elem->getElementsByTagName('service');
 		if($elems->length != 1)
 		{
-			throw new \Exception('PaymentRequestSms::loadFromXml failed: service is missing', self::ERROR_LOAD_FROM_XML_SERVICE_ELEM_MISSING);
+			throw new \Exception('Sms::loadFromXml failed: service is missing', self::ERROR_LOAD_FROM_XML_SERVICE_ELEM_MISSING);
 		}
 		$xmlElem = $elems->item(0);
 		$this->service = $xmlElem->nodeValue;
@@ -64,17 +64,17 @@ class PaymentRequestSms extends PaymentRequestAbstract
         
         if(!isset($reqParams['signature']))
         {
-        	throw new \Exception('PaymentRequestSms::loadFromQueryString failed: signature is missing', self::ERROR_LOAD_FROM_XML_SIGNATURE_ELEM_MISSING);
+        	throw new \Exception('Sms::loadFromQueryString failed: signature is missing', self::ERROR_LOAD_FROM_XML_SIGNATURE_ELEM_MISSING);
         }
         $this->signature = $reqParams['signature'];
         if(!isset($reqParams['service']))
         {
-        	throw new \Exception('PaymentRequestSms::loadFromQueryString failed: service is missing', self::ERROR_LOAD_FROM_XML_SERVICE_ELEM_MISSING);
+        	throw new \Exception('Sms::loadFromQueryString failed: service is missing', self::ERROR_LOAD_FROM_XML_SERVICE_ELEM_MISSING);
         }
         $this->service = $reqParams['service'];
         if(!isset($reqParams['tran_id']))
         {
-        	throw new \Exception('PaymentRequestSms::loadFromQueryString failed: empty order id', self::ERROR_LOAD_FROM_XML_ORDER_ID_ATTR_MISSING);
+        	throw new \Exception('Sms::loadFromQueryString failed: empty order id', self::ERROR_LOAD_FROM_XML_ORDER_ID_ATTR_MISSING);
         }
         $this->orderId = $reqParams['tran_id'];
         if(isset($reqParams['timestamp']))

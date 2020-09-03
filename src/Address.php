@@ -4,13 +4,13 @@ namespace Netopia\Payment;
 
 
 /**
- * Class PaymentAddress
+ * Class Address
  * @copyright NETOPIA
  * @author Claudiu Tudose
  * @version 1.0
  * 
  */
-class PaymentAddress
+class Address
 {
     const TYPE_COMPANY = 'company';
     const TYPE_PERSON = 'person';

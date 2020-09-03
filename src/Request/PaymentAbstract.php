@@ -2,7 +2,7 @@
 
 namespace Netopia\Payment\Request;
 /**
- * Class PaymentRequestAbstract
+ * Class PaymentAbstract
  * This class can be used for accessing mobilpay.ro payment interface for your configured online services
  * @copyright NETOPIA
  * @author Claudiu Tudose
@@ -13,8 +13,8 @@ namespace Netopia\Payment\Request;
  * Check PHP documentation for installing OpenSSL package
  */
 
-use Netopia\Payment\Request\PaymentRequestSms;
-abstract class PaymentRequestAbstract
+use Netopia\Payment\Request\Sms;
+abstract class PaymentAbstract
 {
 	const PAYMENT_TYPE_SMS	= 'sms';
 	const PAYMENT_TYPE_CARD	= 'card';
@@ -54,8 +54,8 @@ abstract class PaymentRequestAbstract
 	public $signature 	= null;
 	/**
 	 * service - identifier of service/product for which you're requesting a payment
-	 * Mandatory for PaymentRequestSms
-	 * Optional for PaymentRequestCard 
+	 * Mandatory for Sms
+	 * Optional for Card 
 	 */
 	public $service		= null;
 	
@@ -119,11 +119,11 @@ abstract class PaymentRequestAbstract
 		srand((double) microtime() * 1000000);
         $this->_requestIdentifier = md5(uniqid(rand()));
         
-        $this->_objRequestParams = new stdClass();
+        $this->_objRequestParams = new \stdClass();
 	}
 	
 	abstract protected function _prepare();
-	abstract protected function _loadFromXml(DOMElement $elem);
+	abstract protected function _loadFromXml(\DOMElement $elem);
 	
 	static public function factory($data)
 	{
@@ -132,13 +132,13 @@ abstract class PaymentRequestAbstract
 		if(@$xmlDoc->loadXML($data) === true)
 		{
 			//try to create payment request from xml
-			$objPmReq = PaymentRequestAbstract::_factoryFromXml($xmlDoc);
+			$objPmReq = PaymentAbstract::_factoryFromXml($xmlDoc);
 			$objPmReq->_setRequestInfo(self::VERSION_XML, $data);
 		}
 		else
 		{
 			//try to create payment request from query string
-			$objPmReq = PaymentRequestAbstract::_factoryFromQueryString($data);
+			$objPmReq = PaymentAbstract::_factoryFromQueryString($data);
 			$objPmReq->_setRequestInfo(self::VERSION_QUERY_STRING, $data);
 		}
 		
@@ -158,30 +158,30 @@ abstract class PaymentRequestAbstract
 		}
 		if($privateKey === false)
         {
-        	throw new Exception('Error loading private key', self::ERROR_CONFIRM_LOAD_PRIVATE_KEY);
+        	throw new \Exception('Error loading private key', self::ERROR_CONFIRM_LOAD_PRIVATE_KEY);
         }
         
         $srcData = base64_decode($encData);
 		if($srcData === false)
 		{
 			@openssl_free_key($privateKey);
-			throw new Exception('Failed decoding data', self::ERROR_CONFIRM_FAILED_DECODING_DATA);
+			throw new \Exception('Failed decoding data', self::ERROR_CONFIRM_FAILED_DECODING_DATA);
 		}
         
 		$srcEnvKey = base64_decode($envKey);
 		if($srcEnvKey === false)
 		{
-			throw new Exception('Failed decoding envelope key', self::ERROR_CONFIRM_FAILED_DECODING_ENVELOPE_KEY);
+			throw new \Exception('Failed decoding envelope key', self::ERROR_CONFIRM_FAILED_DECODING_ENVELOPE_KEY);
 		}
 		
 		$data = null;
 		$result = @openssl_open($srcData, $data, $srcEnvKey, $privateKey);
 		if($result === false)
 		{
-			throw new Exception('Failed decrypting data', self::ERROR_CONFIRM_FAILED_DECRYPT_DATA);
+			throw new \Exception('Failed decrypting data', self::ERROR_CONFIRM_FAILED_DECRYPT_DATA);
 		}
 		
-		return PaymentRequestAbstract::factory($data);
+		return PaymentAbstract::factory($data);
 	}
 	
 	static protected function _factoryFromXml(DOMDocument $xmlDoc)
@@ -189,25 +189,25 @@ abstract class PaymentRequestAbstract
 		$elems = $xmlDoc->getElementsByTagName('order');
 		if($elems->length != 1)
 		{
-			throw new Exception('factoryFromXml order element not found', PaymentRequestAbstract::ERROR_FACTORY_BY_XML_ORDER_ELEM_NOT_FOUND);
+			throw new \Exception('factoryFromXml order element not found', PaymentAbstract::ERROR_FACTORY_BY_XML_ORDER_ELEM_NOT_FOUND);
 		}
 		$orderElem = $elems->item(0);
 		
 		$attr = $orderElem->attributes->getNamedItem('type');
 		if($attr == null || strlen($attr->nodeValue) == 0)
 		{
-			throw new Exception('factoryFromXml invalid payment request type=' . $attr->nodeValue, PaymentRequestAbstract::ERROR_FACTORY_BY_XML_ORDER_TYPE_ATTR_NOT_FOUND);
+			throw new \Exception('factoryFromXml invalid payment request type=' . $attr->nodeValue, PaymentAbstract::ERROR_FACTORY_BY_XML_ORDER_TYPE_ATTR_NOT_FOUND);
 		}
 		switch ($attr->nodeValue)
 		{
-		case PaymentRequestAbstract::PAYMENT_TYPE_CARD:
-			$objPmReq = new PaymentRequestCard();
+		case PaymentAbstract::PAYMENT_TYPE_CARD:
+			$objPmReq = new Card();
 			break;
-		case PaymentRequestAbstract::PAYMENT_TYPE_SMS:
-			$objPmReq =  new PaymentRequestSms();
+		case PaymentAbstract::PAYMENT_TYPE_SMS:
+			$objPmReq =  new Sms();
 			break;
 		default:
-			throw new Exception('factoryFromXml invalid payment request type=' . $attr->nodeValue, PaymentRequestAbstract::ERROR_FACTORY_BY_XML_INVALID_TYPE);
+			throw new \Exception('factoryFromXml invalid payment request type=' . $attr->nodeValue, PaymentAbstract::ERROR_FACTORY_BY_XML_INVALID_TYPE);
 			break;
 		}
 		$objPmReq->_loadFromXml($orderElem);
@@ -217,14 +217,14 @@ abstract class PaymentRequestAbstract
 	
 	static protected function _factoryFromQueryString($data)
 	{
-		$objPmReq = new PaymentRequestSms();
+		$objPmReq = new Sms();
 		$objPmReq->_loadFromQueryString($data); 
 		return $objPmReq;
 	}
 	
 	protected function _setRequestInfo($reqVersion, $reqData)
 	{
-		$this->_objRequestInfo = new stdClass();
+		$this->_objRequestInfo = new \stdClass();
 		$this->_objRequestInfo->reqVersion 	= $reqVersion;
 		$this->_objRequestInfo->reqData 	= $reqData;
 	}
@@ -239,14 +239,14 @@ abstract class PaymentRequestAbstract
 		$xmlAttr = $elem->attributes->getNamedItem('id');
 		if($xmlAttr == null || strlen((string)$xmlAttr->nodeValue) == 0)
 		{
-			throw new Exception('PaymentRequestSms::_parseFromXml failed: empty order id', self::ERROR_LOAD_FROM_XML_ORDER_ID_ATTR_MISSING);
+			throw new \Exception('Sms::_parseFromXml failed: empty order id', self::ERROR_LOAD_FROM_XML_ORDER_ID_ATTR_MISSING);
 		}
 		$this->orderId = $xmlAttr->nodeValue;
 		
 		$elems = $elem->getElementsByTagName('signature');
 		if($elems->length != 1)
 		{
-			throw new Exception('PaymentRequestSms::loadFromXml failed: signature is missing', self::ERROR_LOAD_FROM_XML_SIGNATURE_ELEM_MISSING);
+			throw new \Exception('Sms::loadFromXml failed: signature is missing', self::ERROR_LOAD_FROM_XML_SIGNATURE_ELEM_MISSING);
 		}
 		$xmlElem = $elems->item(0);
 		$this->signature = $xmlElem->nodeValue;
@@ -297,7 +297,7 @@ abstract class PaymentRequestAbstract
 		$elems = $elem->getElementsByTagName('mobilpay');
 		if($elems->length == 1)
 		{
-			$this->objPmNotify = new PaymentRequestNotify();
+			$this->objPmNotify = new Notify();
 			$this->objPmNotify->loadFromXml($elems->item(0));
 		}
 	}
@@ -316,7 +316,7 @@ abstract class PaymentRequestAbstract
 			{
 				$errorMessage .= $errorString . "\n";
 			}
-			throw new Exception($errorMessage, self::ERROR_LOAD_X509_CERTIFICATE);
+			throw new \Exception($errorMessage, self::ERROR_LOAD_X509_CERTIFICATE);
 		}
 		$srcData = $this->_xmlDoc->saveXML();
 		$publicKeys	= array($publicKey);
@@ -332,7 +332,7 @@ abstract class PaymentRequestAbstract
 			{
 				$errorMessage .= $errorString . "\n";
 			}
-			throw new Exception($errorMessage, self::ERROR_ENCRYPT_DATA);
+			throw new \Exception($errorMessage, self::ERROR_ENCRYPT_DATA);
 		}
 		
 		$this->outEncData 	= base64_encode($encData);
@@ -375,7 +375,7 @@ abstract class PaymentRequestAbstract
         return $this->_objRequestParams->$name;
     }
     public function __wakeup(){
-        $this->_objRequestParams= new stdClass();
+        $this->_objRequestParams= new \stdClass();
     }
     public function __sleep()
     {

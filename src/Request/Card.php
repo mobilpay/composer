@@ -2,16 +2,16 @@
 
 namespace Netopia\Payment\Request;
 /**
- * Class PaymentRequestCard
+ * Class Card
  * This class can be used for accessing mobilpay.ro payment interface for your configured online services
  * @copyright NETOPIA
  * @author Claudiu Tudose
  * @version 1.0
  * 
  */
-use Netopia\Payment\Request\PaymentRequestAbstract;
-use Netopia\Payment\PaymentInvoice;
-class PaymentRequestCard extends PaymentRequestAbstract  
+use Netopia\Payment\Request\PaymentAbstract;
+use Netopia\Payment\Invoice;
+class Card extends PaymentAbstract  
 {
 	const ERROR_LOAD_FROM_XML_ORDER_INVOICE_ELEM_MISSING	= 0x30000001;
 	
@@ -31,17 +31,17 @@ class PaymentRequestCard extends PaymentRequestAbstract
 		$elems = $elem->getElementsByTagName('invoice');
 		if($elems->length != 1)
 		{
-			throw new Exception('PaymentRequestCard::loadFromXml failed; invoice element is missing', self::ERROR_LOAD_FROM_XML_ORDER_INVOICE_ELEM_MISSING);
+			throw new \Exception('Card::loadFromXml failed; invoice element is missing', self::ERROR_LOAD_FROM_XML_ORDER_INVOICE_ELEM_MISSING);
 		}
 		
-		$this->invoice = new PaymentInvoice($elems->item(0));
+		$this->invoice = new Invoice($elems->item(0));
 
 		return $this;
 	}
 	
 	protected function _prepare()
 	{
-		if(is_null($this->signature) || is_null($this->orderId) || !($this->invoice instanceof PaymentInvoice))
+		if(is_null($this->signature) || is_null($this->orderId) || !($this->invoice instanceof Invoice))
 		{
 			throw new \Exception('One or more mandatory properties are invalid!', self::ERROR_PREPARE_MANDATORY_PROPERTIES_UNSET);
 		}
