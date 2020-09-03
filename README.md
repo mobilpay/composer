@@ -41,7 +41,7 @@ Run the following command from root of your project
          */
         public $paymentUrl;
         /**
-         * NETOPIA Payments is working only with Certificate. Each NETOPIA member has a certificate.
+         * NETOPIA Payments is working only with Certificate. Each NETOPIA partner (merchant) has a certificate.
          * From your Admin panel you can download the Certificate.
          * is located in Admin -> Conturi de comerciant -> Detalii -> Setari securitate
          * the var $x509FilePath is path of your certificate in your platform
