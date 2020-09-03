@@ -5,14 +5,14 @@
 
 ### Installation
 Run the following command from root of your project 
-* <code>composer require netopia/payment:1.0.0</code>
+* <code>composer require netopia/payment:1.0.2</code>
 #### or 
-* add the **"netopia/payment": "1.0.0"** to your **composer.json** file like the following example
+* add the **"netopia/payment": "1.0.2"** to your **composer.json** file like the following example
     <code>
 
         "require": {
             ...
-            "netopia/payment": "1.0.0",
+            "netopia/payment": "1.0.2",
             ...
         }
     </code>
@@ -243,6 +243,7 @@ Run the following command from root of your project
     }
 </code>
 
-##### if there is issue with namespace in your platform , you can solve it by getting help from provider
-* for ex. in Laravel you can define a provider and put in your vendor and then set your namespace from the composer.json
+##### Note / Suggestions
+* if there is issue with namespace in your platform , you can solve it by getting help from Service Providers. 
+for ex. in Laravel you can define a provider and put in your vendor and then set your namespace from the composer.json
 
