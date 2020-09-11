@@ -128,7 +128,7 @@ abstract class PaymentAbstract
 	static public function factory($data)
 	{
 		$objPmReq = null;
-		$xmlDoc = new DOMDocument();
+		$xmlDoc = new \DOMDocument();
 		if(@$xmlDoc->loadXML($data) === true)
 		{
 			//try to create payment request from xml
@@ -184,7 +184,7 @@ abstract class PaymentAbstract
 		return PaymentAbstract::factory($data);
 	}
 	
-	static protected function _factoryFromXml(DOMDocument $xmlDoc)
+	static protected function _factoryFromXml(\DOMDocument $xmlDoc)
 	{
 		$elems = $xmlDoc->getElementsByTagName('order');
 		if($elems->length != 1)
