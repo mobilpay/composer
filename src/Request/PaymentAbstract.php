@@ -234,7 +234,7 @@ abstract class PaymentAbstract
 		return $this->_objRequestInfo;
 	}
 	
-	protected function _parseFromXml(DOMNode $elem)
+	protected function _parseFromXml(\DOMNode $elem)
 	{
 		$xmlAttr = $elem->attributes->getNamedItem('id');
 		if($xmlAttr == null || strlen((string)$xmlAttr->nodeValue) == 0)
