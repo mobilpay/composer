@@ -5,14 +5,14 @@
 
 ### Installation
 Run the following command from root of your project 
-* <code>composer require netopia/payment:1.0.2</code>
+* <code>composer require netopia/payment</code>
 #### or 
-* add the **"netopia/payment": "1.0.2"** to your **composer.json** file like the following example
+* add the **"netopia/payment"** to your **composer.json** file like the following example
     <code>
 
         "require": {
             ...
-            "netopia/payment": "1.0.2",
+            "netopia/payment": "^1.0",
             ...
         }
     </code>
