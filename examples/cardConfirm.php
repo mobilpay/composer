@@ -12,7 +12,7 @@ if (strcasecmp($_SERVER['REQUEST_METHOD'], 'post') == 0)
 	{
 		#calea catre cheia privata
 		#cheia privata este generata de mobilpay, accesibil in Admin -> Conturi de comerciant -> Detalii -> Setari securitate
-		$privateKeyFilePath = '/home/ctbhub/public_html/phptry/certificates/sandbox.YN8Q-RH4J-39C1-FPAG-2P8Aprivate.key';
+		$privateKeyFilePath = '/YOUR_SERVER/PATH/TO/YOUR/certificates/sandbox.XXXX-XXXX-XXXX-XXXX-XXXXprivate.key';
 		
 		try
 		{

@@ -49,7 +49,7 @@ require __DIR__ . '/vendor/autoload.php';
 $paymentUrl = 'http://sandboxsecure.mobilpay.ro';
 //$paymentUrl = 'https://secure.mobilpay.ro';
 // this is the path on your server to the public certificate. You may download this from Admin -> Conturi de comerciant -> Detalii -> Setari securitate
-$x509FilePath 	= '/home/ctbhub/public_html/phptry/certificates/sandbox.YN8Q-RH4J-39C1-FPAG-2P8A.public.cer';
+$x509FilePath 	= '/YOUR_SERVER/PATH/TO/YOUR/certificates/sandbox.XXXX-XXXX-XXXX-XXXX-XXXX.public.cer';
 try
 {
 	srand((double) microtime() * 1000000);
@@ -62,9 +62,9 @@ try
 	#order_id should be unique for a merchant account
 	$objPmReqCard->orderId 				= md5(uniqid(rand()));
 	#below is where mobilPay will send the payment result. This URL will always be called first; mandatory
-	$objPmReqCard->confirmUrl 			= 'http://phptry.ctbhub.com/cardConfirm.php'; 
+	$objPmReqCard->confirmUrl 			= 'http://yourdomain.com/cardConfirm.php'; 
 	#below is where mobilPay redirects the client once the payment process is finished. Not to be mistaken for a "successURL" nor "cancelURL"; mandatory
-	$objPmReqCard->returnUrl 			= 'http://phptry.ctbhub.com/cardReturn.php'; 
+	$objPmReqCard->returnUrl 			= 'http://yourdomain.com/cardReturn.php'; 
 	
 	#detalii cu privire la plata: moneda, suma, descrierea
 	#payment details: currency, amount, description
