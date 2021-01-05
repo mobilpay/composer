@@ -247,3 +247,4 @@ Run the following command from root of your project
 * if there is issue with namespace in your platform , you can solve it by getting help from Service Providers. 
 for ex. in Laravel you can define a provider and put in your vendor and then set your namespace from the composer.json
 
+* if in any case the Country , City , Zip code , ... is separated from the Address in your application , please merge it with Address and create full address for Billing/Shipping address.
