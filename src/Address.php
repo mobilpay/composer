@@ -22,11 +22,7 @@ class Address
     public $type = null;
     public $firstName = null;
     public $lastName = null;
-    public $country = null;
-    public $county = null;
-    public $city = null;
     public $address = null;
-    public $zipCode = null;
     public $email = null;
     public $mobilePhone = null;
 
@@ -60,38 +56,10 @@ class Address
         {
             $this->lastName = urldecode($elems->item(0)->nodeValue);
         }
-        /**
-         * country, county, city and zip_code 
-         * will be concatenate to the address
-         */
-        $country = $elem->getElementsByTagName('country');
-        if ($country->length == 1)
-        {
-            $this->country = urldecode($elems->item(0)->nodeValue);
-        }
-        $county = $elem->getElementsByTagName('county');
-        if ($county->length == 1)
-        {
-            $this->county = urldecode($elems->item(0)->nodeValue);
-        }
-        $city = $elem->getElementsByTagName('city');
-        if ($city->length == 1)
-        {
-            $this->city = urldecode($elems->item(0)->nodeValue);
-        }
-        $zip_code = $elem->getElementsByTagName('zip_code');
-        if ($zip_code->length == 1)
-        {
-            $this->zipCode = urldecode($elems->item(0)->nodeValue);
-        }
         $elems = $elem->getElementsByTagName('address');
         if ($elems->length == 1)
         {
-            $this->address .= ($this->country) ? $this->country.', ' : '';
-            $this->address .= ($this->county) ? $this->county.', ' : '';
-            $this->address .= ($this->city) ? $this->city.', ' : '';
-            $this->address .= urldecode($elems->item(0)->nodeValue);
-            $this->address .= ($this->zipCode) ? ', '.$this->zipCode : '';
+            $this->address = urldecode($elems->item(0)->nodeValue);
         }
 
         $elems = $elem->getElementsByTagName('email');
