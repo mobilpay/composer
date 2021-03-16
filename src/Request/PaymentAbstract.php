@@ -322,7 +322,8 @@ abstract class PaymentAbstract
 		$publicKeys	= array($publicKey);
 		$encData 	= null;
 		$envKeys 	= null;
-		$result 	= openssl_seal($srcData, $encData, $envKeys, $publicKeys);
+		$cipher_algo = 'RC4';
+		$result 	= openssl_seal($srcData, $encData, $envKeys, $publicKeys, $cipher_algo);
 		if($result === false)
 		{
 			$this->outEncData	= null;
