@@ -122,6 +122,8 @@ catch(\Exception $e)
 	<form name="frmPaymentRedirect" method="post" action="<?php echo $paymentUrl;?>">
 	<input type="hidden" name="env_key" value="<?php echo $objPmReqCard->getEnvKey();?>"/>
 	<input type="hidden" name="data" value="<?php echo $objPmReqCard->getEncData();?>"/>
+	<input type="text" name="cipher" value="<?php echo $objPmReqCard->getCipher();?>" /> 
+	<input type="text" name="iv" value="<?php echo $objPmReqCard->getIv();?>" />
 	<p>
 		Vei redirectat catre pagina de plati securizata a mobilpay.ro
 	</p>

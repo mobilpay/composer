@@ -42,6 +42,8 @@ abstract class PaymentAbstract
 	const ERROR_CONFIRM_INVALID_POST_METHOD					= 0x300000f4;
 	const ERROR_CONFIRM_INVALID_POST_PARAMETERS				= 0x300000f5;
 	const ERROR_CONFIRM_INVALID_ACTION						= 0x300000f6;
+	const ERROR_CONFIRM_FAILED_DECODING_IV 					= 0x300000f7;
+	const ERROR_REQUIRED_CIPHER_NOT_AVAILABLE				= 0x300000f8;
 
 	const VERSION_QUERY_STRING	= 0x01;
     const VERSION_XML			= 0x02;	
@@ -91,6 +93,11 @@ abstract class PaymentAbstract
 	 */
 	public $confirmUrl 	= null;
 
+	/**
+	 * @var string
+	 */
+	public $ipnCipher = null;
+
 	public $params		= array();
 	
 	/**
@@ -104,6 +111,18 @@ abstract class PaymentAbstract
 	 * in this property is stored the encrypted data to send to payment interface 
 	 */
 	private $outEncData	= null;
+
+	/**
+	 * cipher algorithm used to encrypt data
+	 * @var string
+	 */
+	protected $outCipher = null;
+	
+	/**
+	 * intialization vector seed used to encrypt data
+	 * @var string
+	 */
+	protected $outIv = null;
 	
 	protected $_xmlDoc	= null;
 	
@@ -113,7 +132,13 @@ abstract class PaymentAbstract
 	protected $_objRequestInfo	= null;
 	
 	public $objReqNotify		= null;
-	
+
+	public $selectedInstallments 	= null;
+	public $reqInstallments 		= null;
+	public $secretCode 				= null;
+	public $paymentInstrument 		= null;
+
+
 	public function __construct()
 	{
 		srand((double) microtime() * 1000000);
@@ -145,16 +170,24 @@ abstract class PaymentAbstract
 		return $objPmReq;
 	}
 	
-	static public function factoryFromEncrypted($envKey, $encData, $privateKeyFilePath, $privateKeyPassword = null)
+	static public function factoryFromEncrypted($envKey, $encData, $privateKeyFilePath, $privateKeyPassword = null, $cipher_algo = 'rc4', $iv = null)
 	{
 		$privateKey = null;
 		if($privateKeyPassword == null)
 		{
-			$privateKey = @openssl_get_privatekey("file://{$privateKeyFilePath}");
+			$privateKey = @openssl_get_privatekey($privateKeyFilePath);
+			if ($privateKey === false)
+				{
+					$privateKey = @openssl_get_privatekey("file://{$privateKeyFilePath}");
+				}
 		}
 		else
 		{
-			$privateKey = @openssl_get_privatekey("file://{$privateKeyFilePath}", $privateKeyPassword);
+			$privateKey = @openssl_get_privatekey($privateKeyFilePath, $privateKeyPassword);
+			if ($privateKey === false)
+				{
+				$privateKey = @openssl_get_privatekey("file://{$privateKeyFilePath}", $privateKeyPassword);
+				}
 		}
 		if($privateKey === false)
         {
@@ -173,10 +206,22 @@ abstract class PaymentAbstract
 		{
 			throw new \Exception('Failed decoding envelope key', self::ERROR_CONFIRM_FAILED_DECODING_ENVELOPE_KEY);
 		}
-		
+
+		$srcIv = base64_decode($iv ?? '');
+		if($srcIv === false)
+		{
+			throw new \Exception('Failed decoding initialization vector', self::ERROR_CONFIRM_FAILED_DECODING_IV);
+		}
+
 		$data = null;
-		$cipher_algo = 'RC4';
-		$result = @openssl_open($srcData, $data, $srcEnvKey, $privateKey, $cipher_algo);
+		if(PHP_VERSION_ID >= 70000)
+		{
+			$result = @openssl_open($srcData, $data, $srcEnvKey, $privateKey, $cipher_algo, $srcIv);
+		}
+		else
+		{
+			$result = @openssl_open($srcData, $data, $srcEnvKey, $privateKey, $cipher_algo);
+		}
 		if($result === false)
 		{
 			throw new \Exception('Failed decrypting data', self::ERROR_CONFIRM_FAILED_DECRYPT_DATA);
@@ -249,6 +294,18 @@ abstract class PaymentAbstract
 		{
 			throw new \Exception('Sms::loadFromXml failed: signature is missing', self::ERROR_LOAD_FROM_XML_SIGNATURE_ELEM_MISSING);
 		}
+
+		// Add Secret code to XML
+		$xmlAttr = $elem->attributes->getNamedItem('secretcode');
+		if ($xmlAttr == null || strlen((string) $xmlAttr->nodeValue) == 0)
+		{
+			$this->secretCode = '';
+		}
+		else
+		{
+			$this->secretCode = $xmlAttr->nodeValue;
+		}
+
 		$xmlElem = $elems->item(0);
 		$this->signature = $xmlElem->nodeValue;
 		
@@ -269,7 +326,15 @@ abstract class PaymentAbstract
 				$this->confirmUrl = $elems->item(0)->nodeValue; 
 			}
 		}
+
+		// Add "ipn_cipher" to XML
+		$elems = $elem->getElementsByTagName('ipn_cipher');
+		if($elems->length == 1)
+		{
+			$this->ipnCipher = $elems->item(0)->nodeValue;
+		}
 		
+				
 		$this->params = array();
 		$paramElems = $elem->getElementsByTagName('params');
 		if($paramElems->length == 1)
@@ -305,13 +370,17 @@ abstract class PaymentAbstract
 	
 	public function encrypt($x509FilePath)
 	{
-		$this->_prepare();
-		
-		$publicKey = openssl_pkey_get_public("file://{$x509FilePath}");
+		$publicKey = openssl_pkey_get_public($x509FilePath);
+		if ($publicKey === false)
+		{
+			$publicKey = openssl_pkey_get_public("file://{$x509FilePath}");
+		}
 		if($publicKey === false)
 		{
 			$this->outEncData	= null;
 			$this->outEnvKey	= null;
+			$this->outCipher 	= null;
+			$this->outIv 		= null;
 			$errorMessage = "Error while loading X509 public key certificate! Reason:";
 			while(($errorString = openssl_error_string()))
 			{
@@ -319,16 +388,71 @@ abstract class PaymentAbstract
 			}
 			throw new \Exception($errorMessage, self::ERROR_LOAD_X509_CERTIFICATE);
 		}
+				
+		$publicKeys	 = array($publicKey);
+		$encData 	 = null;
+		$envKeys 	 = null;
+		$cipher_algo = 'rc4';
+		$iv 		 = null;
+
+		if(PHP_VERSION_ID >= 70000)
+		{
+			if(OPENSSL_VERSION_NUMBER > 0x10000000)
+			{
+				$cipher_algo = 'aes-256-cbc';
+			}	
+		}
+		else
+		{
+			if(OPENSSL_VERSION_NUMBER >= 0x30000000)
+			{
+				$this->outEncData 	= null;
+				$this->outEnvKey 	= null;
+				$this->outCipher 	= null;
+				$this->outIv 		= null;
+				$errorMessage 		= 'incompatible configuration PHP ' . PHP_VERSION . ' & ' . OPENSSL_VERSION_TEXT;
+				throw new \Exception($errorMessage, self::ERROR_REQUIRED_CIPHER_NOT_AVAILABLE);
+			}
+		}
+
+		$opensslCipherMethods = openssl_get_cipher_methods();
+		if(in_array($cipher_algo, $opensslCipherMethods))
+		{
+		}
+		else if(in_array(strtoupper($cipher_algo), $opensslCipherMethods))
+		{
+			$cipher_algo = strtoupper($cipher_algo);
+		}
+		else
+		{
+			$this->outEncData 	= null;
+			$this->outEnvKey 	= null;
+			$this->outCipher 	= null;
+			$this->outIv 		= null;
+			$errorMessage 		= '`' . $cipher_algo . '` required cipher is not available';
+			throw new \Exception($errorMessage, self::ERROR_REQUIRED_CIPHER_NOT_AVAILABLE);
+		}
+		if($this->ipnCipher === null)
+		{
+			$this->ipnCipher = $cipher_algo;
+		}
+
+		$this->_prepare();
 		$srcData = $this->_xmlDoc->saveXML();
-		$publicKeys	= array($publicKey);
-		$encData 	= null;
-		$envKeys 	= null;
-		$cipher_algo = 'RC4';
-		$result 	= openssl_seal($srcData, $encData, $envKeys, $publicKeys, $cipher_algo);
+		if(PHP_VERSION_ID >= 70000)
+		{
+			$result = openssl_seal($srcData, $encData, $envKeys, $publicKeys, $cipher_algo, $iv);
+		}
+		else
+		{
+			$result = openssl_seal($srcData, $encData, $envKeys, $publicKeys, $cipher_algo);
+		}
 		if($result === false)
 		{
 			$this->outEncData	= null;
 			$this->outEnvKey	= null;
+			$this->outCipher 	= null;
+			$this->outIv 		= null;
 			$errorMessage = "Error while encrypting data! Reason:";
 			while(($errorString = openssl_error_string()))
 			{
@@ -339,6 +463,8 @@ abstract class PaymentAbstract
 		
 		$this->outEncData 	= base64_encode($encData);
 		$this->outEnvKey 	= base64_encode($envKeys[0]);
+		$this->outCipher 	= $cipher_algo;
+		$this->outIv 		= (strlen($iv) > 0) ? base64_encode($iv) : '';
 	}
 
 	public function getEnvKey()
@@ -355,6 +481,32 @@ abstract class PaymentAbstract
 	{
 		return $this->_requestIdentifier;
 	}
+	public function getCipher()
+	{
+		return $this->outCipher;
+	}
+	
+	/**
+	 * Return initialization vector seed used to encrypt data
+	 */
+	public function getIv()
+	{
+		return $this->outIv;
+	}
+
+	/**
+	 *
+	 * Set the request identifier
+	 * @return
+	 */
+	public function setRequestIdentifierPrefix($prefix = null)
+	{
+		if (strpos($this->_requestIdentifier, $prefix) !== 0)
+		{
+			$this->_requestIdentifier = $prefix . $this->_requestIdentifier;
+		}
+	}
+	
 
     public function __isset($name)
     {
@@ -381,6 +533,32 @@ abstract class PaymentAbstract
     }
     public function __sleep()
     {
-        return array('_requestIdentifier','orderId','signature', 'returnUrl', 'confirmUrl', 'params');
+		return array(
+			'_requestIdentifier',
+			'_objRequestInfo',
+			'invoice',
+			'orderId',
+			'signature',
+			'returnUrl',
+			'confirmUrl',
+			'cancelUrl',
+			'params',
+			'reqInstallments',
+			'selectedInstallments',
+			'secretCode',
+			'paymentInstrument', 
+			'ipnCipher'
+		);
     }
+	public function toXml()
+	{
+		$this->_prepare();		
+		return $this->_xmlDoc->saveXML();
+	}
+
+    public function getXml()
+	{
+		$this->_prepare();
+		return $this->_xmlDoc;
+	}
 }

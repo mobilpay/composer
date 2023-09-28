@@ -5,9 +5,20 @@ require __DIR__ . '/vendor/autoload.php';
 $errorCode 		= 0;
 $errorType		= Netopia\Payment\Request\PaymentAbstract::CONFIRM_ERROR_TYPE_NONE;
 $errorMessage	= '';
+$cipher     = 'rc4';
+$iv         = null;
 
 if (strcasecmp($_SERVER['REQUEST_METHOD'], 'post') == 0)
 {
+	if(array_key_exists('cipher', $_POST))
+        {
+            $this->cipher = $_POST['cipher'];
+            if(array_key_exists('iv', $_POST))
+            {
+                $this->iv = $_POST['iv'];
+            }
+        }
+
 	if(isset($_POST['env_key']) && isset($_POST['data']))
 	{
 		#calea catre cheia privata
@@ -17,6 +28,7 @@ if (strcasecmp($_SERVER['REQUEST_METHOD'], 'post') == 0)
 		try
 		{
 		$objPmReq = Netopia\Payment\Request\PaymentAbstract::factoryFromEncrypted($_POST['env_key'], $_POST['data'], $privateKeyFilePath);
+		$objPmReq = Netopia\Payment\Request\PaymentAbstract::factoryFromEncrypted($_POST['env_key'], $_POST['data'], $privateKeyFilePath, null, $cipher, $iv);
 		#uncomment the line below in order to see the content of the request
 		//print_r($objPmReq);
 		$rrn = $objPmReq->objPmNotify->rrn;

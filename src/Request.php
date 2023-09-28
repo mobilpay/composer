@@ -173,7 +173,7 @@ class Request
 		$src_data = Request::buildQueryString($params);
 		$enc_data = '';
 		$env_keys = array();
-		$cipher_algo = 'RC4';
+		$cipher_algo = 'rc4';
 		$result = openssl_seal($src_data, $enc_data, $env_keys, array($public_key), $cipher_algo);
 		if($result === false)
 		{

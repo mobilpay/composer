@@ -12,7 +12,7 @@ Run the following command from root of your project
 
         "require": {
             ...
-            "netopia/payment": "^1.0",
+            "netopia/payment": "^1.1",
             ...
         }
     </code>
@@ -117,6 +117,8 @@ Run the following command from root of your project
                  */
                 $EnvKey = $paymentRequest->getEnvKey();
                 $data   = $paymentRequest->getEncData();
+                $cipher = $paymentRequest->getCipher();
+                $iv     = $paymentRequest->getIv();
             }catch (\Exception $e)
             {
                 return "Oops, There is a problem!";
@@ -151,6 +153,8 @@ Run the following command from root of your project
         public $errorMessage;
         public $paymentUrl;
         public $x509FilePath;
+        public $cipher;
+        public $iv;
     
         ...
         
@@ -161,6 +165,19 @@ Run the following command from root of your project
             $this->errorType = PaymentAbstract::CONFIRM_ERROR_TYPE_NONE;
             $this->errorCode = 0;
             $this->errorMessage = '';
+            $this->cipher     = 'rc4';
+            $this->iv         = null;
+
+            ....
+
+            if(array_key_exists('cipher', $_POST))
+            {
+                $this->cipher = $_POST['cipher'];
+                if(array_key_exists('iv', $_POST))
+                {
+                    $this->iv = $_POST['iv'];
+                }
+            }
     
             $this->paymentUrl = 'http://sandboxsecure.mobilpay.ro';
             $this->x509FilePath = '/home/certificates/sandbox.XXXX-XXXX-XXXX-XXXX-XXXXprivate.key';
@@ -169,7 +186,7 @@ Run the following command from root of your project
             if (strcasecmp($_SERVER['REQUEST_METHOD'], 'post') == 0){
                 if(isset($_POST['env_key']) && isset($_POST['data'])){
                     try {
-                        $paymentRequestIpn = PaymentAbstract::factoryFromEncrypted($_POST['env_key'],$_POST['data'],$this->x509FilePath);
+                        $paymentRequestIpn = PaymentAbstract::factoryFromEncrypted($_POST['env_key'], $_POST['data'], $this->x509FilePath, null, $this->cipher, $this->iv);
                         $rrn = $paymentRequestIpn->objPmNotify->rrn;
                         if ($paymentRequestIpn->objPmNotify->errorCode == 0) {
                             switch($paymentRequestIpn->objPmNotify->action){
