@@ -113,9 +113,10 @@ Run the following command from root of your project
                 /**
                  * send the following data to NETOPIA Payments server
                  * Method : POST
+                 * Parameters : env_key, data, cipher, iv
                  * URL : $paymentUrl
                  */
-                $EnvKey = $paymentRequest->getEnvKey();
+                $env_key = $paymentRequest->getEnvKey();
                 $data   = $paymentRequest->getEncData();
                 $cipher = $paymentRequest->getCipher();
                 $iv     = $paymentRequest->getIv();
