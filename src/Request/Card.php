@@ -98,6 +98,34 @@ class Card extends PaymentAbstract
 			
 			$rootElem->appendChild($xmlParams);
 		}
+
+		/**
+		 * Split
+		 */
+		if(isset($this->split->destinations) && is_array($this->split->destinations) && sizeof($this->split->destinations) > 0 && sizeof($this->split->destinations) <= 2)
+		{
+			$xmlSplit = $this->_xmlDoc->createElement('split');
+			foreach ($this->split->destinations as $key=>$value)
+			{
+				
+				$xmlSplitDes 	= $this->_xmlDoc->createElement('destination');
+				
+				//set Split payment ID attribute
+				$xmlSplitAttr 			= $this->_xmlDoc->createAttribute('id');
+				$xmlSplitAttr->nodeValue	= $value['id'];
+				$xmlSplitDes->appendChild($xmlSplitAttr);
+				
+
+				//set Split payment amount attribute
+				$xmlSplitAttr 			= $this->_xmlDoc->createAttribute('amount');
+				$xmlSplitAttr->nodeValue	= $value['amount'];
+				$xmlSplitDes->appendChild($xmlSplitAttr);
+
+				$xmlSplit->appendChild($xmlSplitDes);
+			}
+			
+			$rootElem->appendChild($xmlSplit);
+		}
 		
 		if(!is_null($this->returnUrl) || !is_null($this->confirmUrl))
 		{

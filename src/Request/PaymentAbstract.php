@@ -141,8 +141,21 @@ abstract class PaymentAbstract
 
 	public function __construct()
 	{
-		srand((double) microtime() * 1000000);
-        $this->_requestIdentifier = md5(uniqid(rand()));
+		/**
+		 * Error "Deprecated: Implicit conversion,..."
+		 * On Converting float to int
+		 */
+		// srand((double) microtime() * 1000000);
+        // $this->_requestIdentifier = md5(uniqid(rand()));
+
+		/**
+		 * Generating the random number and MD5 hash.
+		 */
+		$microtime = microtime();
+		list($usec, $sec) = explode(" ", $microtime);
+		$seed = (int)($sec * 1000000 + $usec);
+		srand($seed);
+        $this->_requestIdentifier = md5(uniqid(rand(), true));
         
         $this->_objRequestParams = new \stdClass();
 	}

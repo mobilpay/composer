@@ -30,6 +30,7 @@ Run the following command from root of your project
     
     use Netopia\Payment\Address;
     use Netopia\Payment\Invoice;
+    use Netopia\Payment\Split;
     use Netopia\Payment\Request\Card;
     
     ...
@@ -105,6 +106,29 @@ Run the following command from root of your project
                 $this->shippingAddress->mobilePhone = "0721234567";
                 $paymentRequest->invoice->setShippingAddress($this->shippingAddress);
     
+                /**
+                * params 
+                * The params is optional
+                */
+                $paymentRequest->params = [
+                    'framework_name'=>"Laravel",
+                    'framework_version'=>"9"
+                ];
+
+                /**
+                * Split payment
+                * this option is ONLY for merchants who, already have split payment setting
+                * 'id' Is the SELLERA_CCOUNT_ID
+                * 'amount' is the splited amount 
+                */
+                $paymentRequest->split = new Split();
+                $paymentRequest->split->destinations = [
+                    [
+                    'id'=>'123456',
+                    'amount'=>"2.75"
+                    ]
+                ];
+
                 /*
                  * encrypting
                  */
