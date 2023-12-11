@@ -117,7 +117,7 @@ Run the following command from root of your project
 
                 /**
                 * Split payment
-                * this option is ONLY for merchants who, already have split payment setting
+                * this option is ONLY for merchants, who already have split payment settings.
                 * 'id' Is the SELLERA_CCOUNT_ID
                 * 'amount' is the splited amount 
                 */
