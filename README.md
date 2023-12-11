@@ -1,4 +1,4 @@
-<div align="center"><a href="https://netopia-payments.com/"><img alt="Parsedown" src="https://suport.mobilpay.ro/np-logo-blue.svg" width="240" /></a></div>
+<div align="center" background-color: rgba(0,0,0,.5)><a href="https://netopia-payments.com/"><img alt="Parsedown" src="https://netopia-payments.com/core/assets/5993428bab/images/logo.png" width="240" /></a></div>
 
 # NETOPIA Payments
 ## NETOPIA Payments Composer
