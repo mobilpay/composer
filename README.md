@@ -285,6 +285,28 @@ Run the following command from root of your project
     }
 </code>
 
+
+To place an order, the following parameters must be sent to our server using the POST method
+* env_key
+* data
+* cipher
+* iv
+#### An example of view
+<code>
+
+    <form id="paymentForm" action="{{ $paymentData['url'] }}" method="POST">
+        <input type="hidden" name="env_key" value="{{ $paymentData['env_key'] }}">
+        <input type="hidden" name="data" value="{{ $paymentData['data'] }}">
+        <input type="hidden" name="cipher" value="{{ $paymentData['cipher'] }}">
+        <input type="hidden" name="iv" value="{{ $paymentData['iv'] }}">
+    </form>
+
+    <script>
+        document.getElementById('paymentForm').submit();
+    </script>
+</code>
+
+
 ##### Note / Suggestions
 * if there is issue with namespace in your platform , you can solve it by getting help from Service Providers. 
 for ex. in Laravel you can define a provider and put in your vendor and then set your namespace from the composer.json
