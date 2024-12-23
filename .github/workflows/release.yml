@@ -1,0 +1,18 @@
+name: NETOPIA SDK Release
+
+on:
+  release:
+    types: [created]
+  workflow_dispatch:  
+
+jobs:  
+  publish:
+    name: Publish to Packagist
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Publish to Packagist
+        run: |
+          curl -X POST "https://packagist.org/api/update-package?username=${{ secrets.PACKAGIST_USERNAME }}&apiToken=${{ secrets.PACKAGIST_API_TOKEN }}" \
+          -H "Content-Type: application/json" \
+          -d '{"repository":{"url":"https://github.com/mobilpay/composer"}}'

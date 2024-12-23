@@ -1,0 +1,72 @@
+name: NETOPIA SDK Publish
+
+on:
+  push:
+    branches:
+      - master
+    tags:
+      - 'v*'  
+  pull_request:
+    branches:
+      - master
+  workflow_dispatch: 
+
+jobs:
+  analysis:
+    name: Code Analysis
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout code
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      # Set up PHP
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "7.4"
+
+      # Install Composer dependencies
+      - name: Install Dependencies
+        run: |
+          composer install --prefer-dist --no-progress --no-suggest
+
+      # Validate composer.json
+      - name: Validate Composer
+        run: |
+          composer validate --strict
+
+      # Run unit tests 
+      - name: Run Unit Tests
+        run: |
+          if [ -f "phpunit.xml" ]; then
+            vendor/bin/phpunit
+          else
+            echo "No tests found. Skipping."
+          fi
+
+  release:
+    name: Create Github Release
+    if: github.ref_type == 'tag'  # Run only for tag pushes
+    runs-on: ubuntu-latest
+    needs: analysis
+    steps:
+      # Checkout code
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      # Extract tag name
+      - name: Get Tag Name
+        id: get_tag
+        run: echo "TAG_NAME=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
+
+      # Create Release
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ env.TAG_NAME }}
+          name: Release ${{ env.TAG_NAME }}
+          body_path: ./CHANGELOG.md
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
