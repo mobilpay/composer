@@ -33,7 +33,7 @@ class Invoice
 	protected $items			= array();
 	protected $exchangeRates	= array();
 
-	public function __construct(\DOMNode $elem = null)
+	public function __construct(?\DOMNode $elem = null)
 	{
 		if($elem != null)
 		{

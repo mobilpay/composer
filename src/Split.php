@@ -28,7 +28,7 @@ class Split
      */
     public $destinations = null;
 
-    // public function __construct(\DOMNode $elem = null)
+    // public function __construct(?\DOMNode $elem = null)
     // {
     //     if($elem != null) {
     //         $this->loadFromXml($elem);
