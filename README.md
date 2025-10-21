@@ -257,7 +257,7 @@ Run the following command from root of your project
                 }else{
                     $this->errorType = PaymentAbstract::CONFIRM_ERROR_TYPE_PERMANENT;
                     $this->errorCode = PaymentAbstract::ERROR_CONFIRM_INVALID_POST_PARAMETERS;
-                    $this->errorMessag = 'mobilpay.ro posted invalid parameters';
+                    $this->errorMessage = 'mobilpay.ro posted invalid parameters';
                 }
     
             } else {
