@@ -28,7 +28,7 @@ class Item
 	public $price		= null;
 	public $vat			= null;
 		
-	public function __construct(\DOMNode $elem = null)
+	public function __construct(?\DOMNode $elem = null)
 	{
 		if($elem != null)
 		{
